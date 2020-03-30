@@ -1,6 +1,6 @@
-## Lightbend Akka for Scala - Professional
+# Hello Akka for Scala
 
----
+## Lightbend Akka for Scala - Professional
 
 ### Introduction
 
@@ -14,11 +14,7 @@ We recommend using the following tools:
 - Eclipse or IntelliJ, both with Scala plugin
 - sbt build tool
 
----
-
 ## Prerequisites
-
----
 
 ### Required Knowledge and Software
 
@@ -28,13 +24,9 @@ This course is best suited for individuals that have knowledge of Scala as cover
 - JVM 1.8 or higher
 - Sbt 0.13.13 or higher
 
----
-
 ### Unix Compatible Shell
 
 If you are running OSX, then you are on a **nix** system already. Otherwise install a Unix compatible shell like [Cygwin](https://www.cygwin.com/).
-
----
 
 ### JVM 1.8 or Higher
 
@@ -53,8 +45,6 @@ Java(TM) SE Runtime Environment (build 1.8.0_111-b14)
 Java HotSpot(TM) 64-Bit Server VM (build 25.111-b14, mixed mode)
 ```
 
----
-
 ### Sbt 0.13.13 or Higher
 
 If you are running OSX and a [Homebrew](http://brew.sh/) user, from a terminal run:
@@ -70,11 +60,7 @@ $ sbt -version
 sbt launcher 0.13.13
 ```
 
----
-
 ## Simple Build Tool
-
----
 
 ### Make Yourself Familiar with Sbt
 
@@ -88,8 +74,6 @@ $ sbt
 man [e] > coffee-house > initial-state >
 ```
 
----
-
 ### man
 
 The `man` command, short for manual, displays the setup instructions (what you are reading now) for the courseware. To view the instructions for the current exercise, use the `e` option. If you are using an IDE, you can also open up the setup instructions (`README.md`) file or the current exercises instructions (`src/test/resources/README.md`) file in your workspace.
@@ -102,8 +86,6 @@ man [e] > coffee-house > initial-state > man
 man [e] > coffee-house > initial-state > man e
 ```
 
----
-
 ### run
 
 As part of each exercise, we use the `run` command to bootstrap the main class `CoffeeHouseApp`. This command starts the application for the **current** exercise that we interact with and verify our solution.
@@ -111,8 +93,6 @@ As part of each exercise, we use the `run` command to bootstrap the main class `
 ```scala
 man [e] > coffee-house > initial-state > run
 ```
-
----
 
 ### course navigation and testing
 
@@ -146,8 +126,6 @@ man [e] > coffee-house > message-actor > restoreState exercise_002_top_level_act
 [INFO] Exercise exercise_002_top_level_actor restored
 ```
 
----
-
 ### clean
 
 To clean your current exercise, use the `clean` command from your `sbt` session. Clean deletes all generated files in the `target` directory.
@@ -155,8 +133,6 @@ To clean your current exercise, use the `clean` command from your `sbt` session.
 ```scala
 man [e] > coffee-house > initial-state > clean
 ```
-
----
 
 ### compile
 
@@ -166,8 +142,6 @@ To compile your current exercise, use the `compile` command from your `sbt` sess
 man [e] > coffee-house > initial-state > compile
 ```
 
----
-
 ### reload
 
 To reload `sbt`, use the `reload` command from your `sbt` session. This command reloads the build definitions, `build.sbt`, `project/.scala` and `project/.sbt` files. Reloading is a **requirement** if you change the build definition files.
@@ -175,8 +149,6 @@ To reload `sbt`, use the `reload` command from your `sbt` session. This command 
 ```scala
 man [e] > coffee-house > initial-state > reload
 ```
-
----
 
 ### test
 
@@ -186,11 +158,7 @@ To test your current exercise, use the `test` command from your `sbt` session. T
 man [e] > coffee-house > initial-state > test
 ```
 
----
-
 ## Eclipse
-
----
 
 ### Install the Scala IDE for Eclipse
 
@@ -203,8 +171,6 @@ Follow these instructions if you want to use Eclipse:
     - Use the following [update site](http://scala-ide.org/download/current.html) for Eclipse 4.3 and 4.4 (Kepler and Luna)
 - In Eclipse import the `coffee-house` project with `Import... > Existing Projects into Workspace`
 
----
-
 ### Install the ScalaTest Plugin for Eclipse
 
 Follow these instructions if you want to use Eclipse:
@@ -216,11 +182,7 @@ Follow these instructions if you want to use Eclipse:
 - Press `Next` > and follow the installation process
 - Restart Eclipse if prompted
 
----
-
 ## IntelliJ
-
----
 
 ### Install IntelliJ IDEA with Scala Plugin
 
@@ -230,11 +192,7 @@ Follow these instructions if you want to use IntelliJ IDEA:
 - Start IntelliJ IDEA and install the Scala plugin via the plugin configuration
 - Import the Coffee House project via `Import Project`
 
----
-
 ## Case Study
-
----
 
 ### Coffee House
 
@@ -245,8 +203,6 @@ Welcome to the Akka Coffee House where we work through a series of exercises org
 - Barista's becoming **bottlenecks**
 
 Our mission is to keep the Akka Coffee House healthy, so make sure you have the deck handy as it is a useful reference for guidance.
-
----
 
 ### Exercise Outline
 
