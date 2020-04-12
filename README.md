@@ -33,7 +33,7 @@ If you are running OSX, then you are on a **nix** system already. Otherwise inst
 If you are running OSX and a [Homebrew Cask](https://github.com/caskroom/homebrew-cask) user, from a terminal run:
 
 ```bash
-$ brew cask install java
+brew cask install java
 ```
 
 Otherwise follow the [setup instructions](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) to download and install. Once the installation is complete, very the installation by running the following command in a terminal session:
@@ -50,7 +50,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.111-b14, mixed mode)
 If you are running OSX and a [Homebrew](http://brew.sh/) user, from a terminal run:
 
 ```bash
-$ brew install sbt
+brew install sbt
 ```
 
 Otherwise follow the [setup instruction](http://www.scala-sbt.org/0.13/docs/index.html) to download and install. Once the installation is complete, verify the installation by running the following command in a terminal session:
@@ -167,8 +167,8 @@ Follow these instructions if you want to use Eclipse:
 - **Attention**: Make sure you pick the right packages for Scala 2.11!
 - You can download the prepackaged and preconfigured [Scala IDE](http://scala-ide.org/download/sdk.html) for your platform
 - You can also use your already installed Eclipse:
-    - Install the latest Scala IDE plugin
-    - Use the following [update site](http://scala-ide.org/download/current.html) for Eclipse 4.3 and 4.4 (Kepler and Luna)
+  - Install the latest Scala IDE plugin
+  - Use the following [update site](http://scala-ide.org/download/current.html) for Eclipse 4.3 and 4.4 (Kepler and Luna)
 - In Eclipse import the `coffee-house` project with `Import... > Existing Projects into Workspace`
 
 ### Install the ScalaTest Plugin for Eclipse
