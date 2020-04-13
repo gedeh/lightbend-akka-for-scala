@@ -29,5 +29,12 @@ class CoffeeHouseAppSpec extends BaseAkkaSpec {
       new CoffeeHouseApp(system)
       TestProbe().expectActor("/user/coffee-house")
     }
+    "result in sending a message to CoffeeHouse" in {
+      val coffeeHouse = TestProbe()
+      new CoffeeHouseApp(system) {
+        override def createCoffeeHouse() = coffeeHouse.ref
+      }
+      coffeeHouse.expectMsgType[Any]
+    }
   }
 }
