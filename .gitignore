@@ -4,5 +4,6 @@
 
 target
 exercises/akka-diagnostics
+exercises/logs
 
 lightbend.sbt

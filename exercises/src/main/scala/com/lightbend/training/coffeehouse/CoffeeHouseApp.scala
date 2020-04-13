@@ -50,7 +50,7 @@ class CoffeeHouseApp(system: ActorSystem) extends Terminal {
   }
 
   protected def createCoffeeHouse(): ActorRef =
-    system.deadLetters
+    system.actorOf(CoffeeHouse.props(), "coffee-house")
 
   @tailrec
   private def commandLoop(): Unit =
