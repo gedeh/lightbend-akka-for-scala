@@ -4,7 +4,9 @@
 
 package com.lightbend.training.coffeehouse
 
-import akka.testkit.TestProbe
+import akka.actor.Actor
+import akka.event.Logging.Info
+import akka.testkit.{EventFilter, TestActorRef, TestProbe}
 
 class CoffeeHouseAppSpec extends BaseAkkaSpec {
 
@@ -35,6 +37,19 @@ class CoffeeHouseAppSpec extends BaseAkkaSpec {
         override def createCoffeeHouse() = coffeeHouse.ref
       }
       coffeeHouse.expectMsgType[Any]
+    }
+    "result in logging CoffeeHouse's response at info" in {
+      EventFilter.custom({ case Info(source, _, "Got reply: response") => source contains "$" }, 1) intercept {
+        new CoffeeHouseApp(system) {
+          // Test actor replacing CoffeeHouse actor created here will
+          // send message "response" to Actor created in CoffeeHouseApp constructor
+          override def createCoffeeHouse() = TestActorRef(new Actor {
+            override def receive = {
+              case _ => sender() ! "response"
+            }
+          })
+        }
+      }
     }
   }
 }

@@ -11,6 +11,8 @@ import scala.annotation.tailrec
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.io.StdIn
+import akka.actor.Props
+import akka.actor.Actor
 
 object CoffeeHouseApp {
 
@@ -39,39 +41,42 @@ class CoffeeHouseApp(system: ActorSystem) extends Terminal {
   private val log = Logging(system, getClass.getName)
 
   private val coffeeHouse = createCoffeeHouse()
-  coffeeHouse ! "Brew Coffee"
+
+  system.actorOf(Props( new Actor {
+
+    coffeeHouse ! "Brew Coffee"
+
+    override def receive: Receive = {
+      case msg: String => log.info(s"Got reply: ${msg.toString}")
+    }
+
+  }))
 
   def run(): Unit = {
-    log.warning(f"{} running%nEnter "
-      + Console.BLUE + "commands" + Console.RESET
-      + " into the terminal: "
-      + Console.BLUE + "[e.g. `q` or `quit`]" + Console.RESET, getClass.getSimpleName)
+    log.info("{} running", getClass.getSimpleName)
+    log.info("Enter commands into the terminal: [e.g. `q` or `quit`]")
     commandLoop()
     Await.ready(system.whenTerminated, Duration.Inf)
   }
 
-  protected def createCoffeeHouse(): ActorRef =
-    system.actorOf(CoffeeHouse.props(), "coffee-house")
+  protected def createCoffeeHouse(): ActorRef = system.actorOf(CoffeeHouse.props(), "coffee-house")
 
   @tailrec
-  private def commandLoop(): Unit =
-    Command(StdIn.readLine()) match {
-      case Command.Guest(count, coffee, caffeineLimit) =>
-        createGuest(count, coffee, caffeineLimit)
-        commandLoop()
-      case Command.Status =>
-        status()
-        commandLoop()
-      case Command.Quit =>
-        system.terminate()
-      case Command.Unknown(command) =>
-        log.warning("Unknown command {}!", command)
-        commandLoop()
-    }
+  private def commandLoop(): Unit = Command(StdIn.readLine()) match {
+    case Command.Guest(count, coffee, caffeineLimit) =>
+      createGuest(count, coffee, caffeineLimit)
+      commandLoop()
+    case Command.Status =>
+      status()
+      commandLoop()
+    case Command.Quit =>
+      system.terminate()
+    case Command.Unknown(command) =>
+      log.warning("Unknown command {}!", command)
+      commandLoop()
+  }
 
-  protected def createGuest(count: Int, coffee: Coffee, caffeineLimit: Int): Unit =
-    ()
+  protected def createGuest(count: Int, coffee: Coffee, caffeineLimit: Int): Unit = ()
 
-  protected def status(): Unit =
-    ()
+  protected def status(): Unit = ()
 }
