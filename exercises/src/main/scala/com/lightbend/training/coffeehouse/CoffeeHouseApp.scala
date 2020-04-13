@@ -11,8 +11,6 @@ import scala.annotation.tailrec
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.io.StdIn
-import akka.actor.Props
-import akka.actor.Actor
 
 object CoffeeHouseApp {
 
@@ -39,22 +37,10 @@ object CoffeeHouseApp {
 class CoffeeHouseApp(system: ActorSystem) extends Terminal {
 
   private val log = Logging(system, getClass.getName)
-
   private val coffeeHouse = createCoffeeHouse()
 
-  system.actorOf(Props( new Actor {
-
-    coffeeHouse ! "Brew Coffee"
-
-    override def receive: Receive = {
-      case msg: String => log.info(s"Got reply: ${msg.toString}")
-    }
-
-  }))
-
   def run(): Unit = {
-    log.info("{} running", getClass.getSimpleName)
-    log.info("Enter commands into the terminal: [e.g. `q` or `quit`]")
+    log.info("{} running. Enter commands into the terminal: [e.g. `q` or `quit`]", getClass.getSimpleName)
     commandLoop()
     Await.ready(system.whenTerminated, Duration.Inf)
   }
@@ -76,7 +62,11 @@ class CoffeeHouseApp(system: ActorSystem) extends Terminal {
       commandLoop()
   }
 
-  protected def createGuest(count: Int, coffee: Coffee, caffeineLimit: Int): Unit = ()
+  protected def createGuest(count: Int, coffee: Coffee, caffeineLimit: Int): Unit = {
+    (1 to count).foreach {
+      _ => coffeeHouse ! CoffeeHouse.CreateGuest
+    }
+  }
 
   protected def status(): Unit = ()
 }
