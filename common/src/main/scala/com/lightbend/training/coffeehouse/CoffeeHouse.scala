@@ -11,12 +11,17 @@ object CoffeeHouse {
 class CoffeeHouse extends Actor with ActorLogging {
     import CoffeeHouse._
 
-    log.info("CoffeHouse Open")
     val waiter: ActorRef = createWaiter()
 
-    protected def createWaiter(): ActorRef = context.actorOf(Waiter.props(), "waiter")
+    protected def createWaiter(): ActorRef = {
+        context.actorOf(Waiter.props(), "waiter")
+    }
     protected def createGuest(favoriteCoffee: Coffee): ActorRef = {
         context.actorOf(Guest.props(waiter, favoriteCoffee))
+    }
+
+    override def preStart(): Unit = {
+        log.info("CoffeHouse Started")
     }
 
     override def receive: Receive = {

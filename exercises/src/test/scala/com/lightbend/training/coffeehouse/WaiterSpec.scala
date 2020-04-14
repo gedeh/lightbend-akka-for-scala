@@ -4,6 +4,7 @@
 
 package com.lightbend.training.coffeehouse
 
+import akka.actor.ActorRef
 import akka.testkit.TestProbe
 
 class WaiterSpec extends BaseAkkaSpec {
@@ -11,8 +12,8 @@ class WaiterSpec extends BaseAkkaSpec {
   "Sending ServeCoffee to Waiter" should {
     "result in sending a CoffeeServed response to sender" in {
       val sender = TestProbe()
-      implicit val ref = sender.ref
-      val waiter = system.actorOf(Waiter.props)
+      implicit val ref: ActorRef = sender.ref
+      val waiter = system.actorOf(Waiter.props())
       waiter ! Waiter.ServeCoffee(Coffee.Akkaccino)
       sender.expectMsg(Waiter.CoffeeServed(Coffee.Akkaccino))
     }
