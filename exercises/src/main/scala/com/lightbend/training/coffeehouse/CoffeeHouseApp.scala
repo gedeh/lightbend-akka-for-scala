@@ -62,9 +62,9 @@ class CoffeeHouseApp(system: ActorSystem) extends Terminal {
       commandLoop()
   }
 
-  protected def createGuest(count: Int, coffee: Coffee, caffeineLimit: Int): Unit = {
+  protected def createGuest(count: Int, favoriteCoffee: Coffee, caffeineLimit: Int): Unit = {
     (1 to count).foreach {
-      _ => coffeeHouse ! CoffeeHouse.CreateGuest
+      _ => coffeeHouse ! CoffeeHouse.CreateGuest(favoriteCoffee)
     }
   }
 
