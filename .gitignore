@@ -3,7 +3,7 @@
 .idea
 
 target
-exercises/akka-diagnostics
-exercises/logs
+akka-diagnostics
+logs
 
 lightbend.sbt
