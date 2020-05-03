@@ -31,7 +31,7 @@ class CoffeeHouseSpec extends BaseAkkaSpec {
     "result in creating a Guest" in {
       val coffeeHouse = system.actorOf(CoffeeHouse.props(Int.MaxValue), "create-guest")
       coffeeHouse ! CoffeeHouse.CreateGuest(Coffee.Akkaccino)
-      TestProbe().expectActor("/user/create-guest/$*")
+      TestProbe().expectActor("/user/create-guest/guest-*")
     }
     "result in logging status guest added to guest book" in {
       val coffeeHouse = system.actorOf(CoffeeHouse.props(Int.MaxValue), "add-to-guest-book")

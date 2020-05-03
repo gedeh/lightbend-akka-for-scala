@@ -37,6 +37,7 @@ object CoffeeHouseApp {
 class CoffeeHouseApp(system: ActorSystem) extends Terminal {
 
   private val log = Logging(system, getClass.getName)
+  private val caffeineLimit: Int = system.settings.config.getInt("coffee-house.caffeine-limit")
   private val coffeeHouse = createCoffeeHouse()
 
   def run(): Unit = {
@@ -45,7 +46,9 @@ class CoffeeHouseApp(system: ActorSystem) extends Terminal {
     Await.ready(system.whenTerminated, Duration.Inf)
   }
 
-  protected def createCoffeeHouse(): ActorRef = system.actorOf(CoffeeHouse.props(), "coffee-house")
+  protected def createCoffeeHouse(): ActorRef = {
+    system.actorOf(CoffeeHouse.props(caffeineLimit), "coffee-house")
+  }
 
   @tailrec
   private def commandLoop(): Unit = Command(StdIn.readLine()) match {

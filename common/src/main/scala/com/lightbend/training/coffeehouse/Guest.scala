@@ -20,7 +20,6 @@ class Guest(waiter: ActorRef, favoriteCoffee: Coffee, finishCoffeeDuration: Fini
     with ActorLogging
     with Timers {
 
-  val maxCoffee = 10
   var coffeeCount: Int = 0
   orderCoffee()
 
@@ -31,7 +30,12 @@ class Guest(waiter: ActorRef, favoriteCoffee: Coffee, finishCoffeeDuration: Fini
       timers.startSingleTimer("coffee-finished", CoffeeFinished, finishCoffeeDuration)
     case Guest.CoffeeFinished =>
       log.info(s"Finished my #$coffeeCount $favoriteCoffee")
-      if (coffeeCount != maxCoffee) orderCoffee()
+      orderCoffee()
+  }
+
+  override def postStop(): Unit = {
+    log.info("Well that's it then, good bye!")
+    super.postStop()
   }
 
   private def orderCoffee(): Unit = {

@@ -1,7 +1,6 @@
 package com.lightbend.training.coffeehouse
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import com.lightbend.training.coffeehouse.Waiter.CoffeeServed
 
 object Waiter {
   case class ServeCoffee(coffee: Coffee) // parameter to function
@@ -11,11 +10,15 @@ object Waiter {
 }
 
 class Waiter(barista: ActorRef) extends Actor with ActorLogging {
+
+  import Waiter._
+  import Barista._
+
   override def receive: Receive = {
-    case Waiter.ServeCoffee(coffee) =>
+    case ServeCoffee(coffee) =>
       log.info(s"Sending order coffee $coffee from ${sender().path.name} to barista")
-      barista ! Barista.PrepareCoffee(coffee, sender())
-    case Barista.CoffeePrepared(coffee, guest) =>
+      barista ! CoffeeHouse.ApproveCoffee(coffee, sender())
+    case CoffeePrepared(coffee, guest) =>
       log.info(s"Serving coffee $coffee to ${guest.path.name}")
       guest ! CoffeeServed(coffee)
   }
