@@ -1,7 +1,7 @@
 
 import sbt._
 
-lazy val base = (project in file("."))
+lazy val `lightbend-akka-for-scala` = (project in file("."))
   .aggregate(
     common,
     exercises
