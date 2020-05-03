@@ -13,7 +13,7 @@ class WaiterSpec extends BaseAkkaSpec {
       val barista = TestProbe()
       val guest = TestProbe()
       implicit val ref = guest.ref
-      val waiter = system.actorOf(Waiter.props(barista.ref))
+      val waiter = testActorSystem.actorOf(Waiter.props(barista.ref))
       waiter ! Waiter.ServeCoffee(Coffee.Akkaccino)
       barista.expectMsg(Barista.PrepareCoffee(Coffee.Akkaccino, guest.ref))
     }

@@ -29,13 +29,13 @@ abstract class BaseAkkaSpec extends BaseSpec with BeforeAndAfterAll {
     }
   }
 
-  implicit val system = ActorSystem()
-  system.eventStream.publish(TestEvent.Mute(EventFilter.debug()))
-  system.eventStream.publish(TestEvent.Mute(EventFilter.info()))
-  system.eventStream.publish(TestEvent.Mute(EventFilter.warning()))
-  system.eventStream.publish(TestEvent.Mute(EventFilter.error()))
+  implicit val testActorSystem = ActorSystem()
+  testActorSystem.eventStream.publish(TestEvent.Mute(EventFilter.debug()))
+  testActorSystem.eventStream.publish(TestEvent.Mute(EventFilter.info()))
+  testActorSystem.eventStream.publish(TestEvent.Mute(EventFilter.warning()))
+  testActorSystem.eventStream.publish(TestEvent.Mute(EventFilter.error()))
 
   override protected def afterAll(): Unit = {
-    Await.ready(system.terminate(), 20.seconds)
+    Await.ready(testActorSystem.terminate(), 20.seconds)
   }
 }

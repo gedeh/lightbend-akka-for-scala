@@ -20,18 +20,23 @@ class Guest(waiter: ActorRef, favoriteCoffee: Coffee, finishCoffeeDuration: Fini
     with ActorLogging
     with Timers {
 
+  val maxCoffee = 10
   var coffeeCount: Int = 0
   orderCoffee()
 
   override def receive: Receive = {
     case Waiter.CoffeeServed(coffee) =>
       coffeeCount += 1
-      log.info(s"Enjoying my $coffeeCount yummy $coffee!")
+      log.info(s"Enjoying my #$coffeeCount $coffee!")
       timers.startSingleTimer("coffee-finished", CoffeeFinished, finishCoffeeDuration)
     case Guest.CoffeeFinished =>
-      log.info(s"Finished my latest coffee")
-      orderCoffee()
+      log.info(s"Finished my #$coffeeCount $favoriteCoffee")
+      if (coffeeCount != maxCoffee) orderCoffee()
   }
 
-  private def orderCoffee(): Unit = waiter ! Waiter.ServeCoffee(favoriteCoffee)
+  private def orderCoffee(): Unit = {
+    log.info(s"Order #${coffeeCount + 1} $favoriteCoffee to waiter")
+    waiter ! Waiter.ServeCoffee(favoriteCoffee)
+  }
+
 }

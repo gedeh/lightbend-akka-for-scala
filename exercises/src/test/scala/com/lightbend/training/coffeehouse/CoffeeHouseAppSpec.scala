@@ -26,7 +26,7 @@ class CoffeeHouseAppSpec extends BaseAkkaSpec {
 
   "Creating CoffeeHouseApp" should {
     "result in creating a top-level actor named 'coffee-house'" in {
-      new CoffeeHouseApp(system)
+      new CoffeeHouseApp(testActorSystem)
       TestProbe().expectActor("/user/coffee-house")
     }
   }
@@ -34,7 +34,7 @@ class CoffeeHouseAppSpec extends BaseAkkaSpec {
   "Calling createGuest" should {
     "result in sending CreateGuest to CoffeeHouse count number of times" in {
       val probe = TestProbe()
-      new CoffeeHouseApp(system) {
+      new CoffeeHouseApp(testActorSystem) {
         createGuest(2, Coffee.Akkaccino, Int.MaxValue)
         override def createCoffeeHouse() = probe.ref
       }
