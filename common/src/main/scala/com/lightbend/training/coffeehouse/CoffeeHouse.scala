@@ -2,7 +2,6 @@ package com.lightbend.training.coffeehouse
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.SupervisorStrategy.{Escalate, Restart, Stop}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, SupervisorStrategy, Terminated}
 import com.lightbend.training.coffeehouse.Waiter.FrustratedException
 
@@ -28,11 +27,12 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
         val decider: SupervisorStrategy.Decider = {
             case CaffeineException =>
                 log.info("Got a guest with too many caffeine, stopping them")
-                Stop
-            case FrustratedException =>
+                SupervisorStrategy.Stop
+            case FrustratedException(coffee, guest) =>
                 log.info("Got a waiter frustrated with too many complaints, restarting them")
-                Restart
-            case t => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => Escalate)
+                barista.forward(Barista.PrepareCoffee(coffee, guest))
+                SupervisorStrategy.Restart
+            case t => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => SupervisorStrategy.Escalate)
         }
         OneForOneStrategy()(decider.orElse(super.supervisorStrategy.decider))
     }
@@ -54,10 +54,10 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
             TimeUnit.SECONDS).seconds
 
     private val barista: ActorRef = createBarista()
-    private val waiter: ActorRef = createWaiter(self, barista)
+    private val waiter: ActorRef = createWaiter()
 
-    protected def createWaiter(coffeeHouse: ActorRef, barista: ActorRef): ActorRef = {
-        context.actorOf(Waiter.props(coffeeHouse, barista, waiterMaxComplaintCount), "waiter")
+    protected def createWaiter(): ActorRef = {
+        context.actorOf(Waiter.props(self, barista, waiterMaxComplaintCount), "waiter")
     }
 
     protected def createBarista(): ActorRef = {

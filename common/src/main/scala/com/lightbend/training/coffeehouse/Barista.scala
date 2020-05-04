@@ -17,7 +17,7 @@ class Barista(prepareCoffeeDuration: FiniteDuration, accuracy: Int) extends Acto
   override def receive: Receive = {
     case PrepareCoffee(coffee, guest) =>
       val coffeeMade = if (Random.nextInt(100) < accuracy) coffee else Coffee.anyOther(coffee)
-      log.info(s"Preparing coffee $coffeeMade for guest ${guest.path.name}")
+      log.info(s"Preparing coffee $coffeeMade for guest ${guest.path.name}. Original order is $coffee")
       busy(prepareCoffeeDuration)
       sender() ! CoffeePrepared(coffeeMade, guest)
   }

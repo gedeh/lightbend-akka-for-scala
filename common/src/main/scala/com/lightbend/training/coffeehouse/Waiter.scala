@@ -6,7 +6,7 @@ object Waiter {
   case class ServeCoffee(coffee: Coffee)
   case class CoffeeServed(coffee: Coffee)
   case class Complaint(coffee: Coffee)
-  case object FrustratedException extends IllegalStateException
+  case class FrustratedException(coffee: Coffee, guest: ActorRef) extends IllegalStateException
 
   def props(coffeeHouse: ActorRef, barista: ActorRef, maxComplaintCount: Int): Props =
     Props(new Waiter(coffeeHouse, barista, maxComplaintCount))
@@ -27,10 +27,10 @@ class Waiter(coffeeHouse: ActorRef, barista: ActorRef, maxComplaintCount: Int) e
     case CoffeePrepared(coffee, guest) =>
       log.info(s"Serving coffee $coffee to guest ${guest.path.name}")
       guest ! CoffeeServed(coffee)
-    case Complaint(coffee) if (complaintsReceived < maxComplaintCount) =>
+    case Complaint(coffee) if complaintsReceived < maxComplaintCount =>
       complaintsReceived += 1
       barista ! Barista.PrepareCoffee(coffee, sender())
-    case Complaint(_) =>
-      throw FrustratedException
+    case Complaint(coffee) =>
+      throw FrustratedException(coffee, sender())
   }
 }
