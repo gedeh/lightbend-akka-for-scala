@@ -17,6 +17,7 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
     import Barista._
     import CoffeeHouse._
 
+    //noinspection ActorMutableStateInspection
     private var guestCaffeineIntake: Map[ActorRef, Int] = Map.empty.withDefaultValue(0)
 
     private val finishCoffeeDuration: FiniteDuration =

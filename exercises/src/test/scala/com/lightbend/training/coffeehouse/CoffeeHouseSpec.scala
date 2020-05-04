@@ -31,7 +31,7 @@ class CoffeeHouseSpec extends BaseAkkaSpec {
     "result in creating a Guest" in {
       val coffeeHouse = system.actorOf(CoffeeHouse.props(Int.MaxValue), "create-guest")
       coffeeHouse ! CoffeeHouse.CreateGuest(Coffee.Akkaccino)
-      TestProbe().expectActor("/user/create-guest/guest-*")
+      TestProbe().expectActor("/user/create-guest/$*")
     }
     "result in logging status guest added to guest book" in {
       val coffeeHouse = system.actorOf(CoffeeHouse.props(Int.MaxValue), "add-to-guest-book")
@@ -85,6 +85,39 @@ class CoffeeHouseSpec extends BaseAkkaSpec {
       val coffeeHouse = system.actorOf(CoffeeHouse.props(0))
       coffeeHouse ! CoffeeHouse.ApproveCoffee(Coffee.Akkaccino, guest)
       probe.expectTerminated(guest)
+    }
+  }
+
+  "On termination of Guest, CoffeeHouse" should {
+    "remove the guest from the guest book" in {
+      val barista = TestProbe()
+      val coffeeHouse =
+        TestActorRef(new CoffeeHouse(Int.MaxValue) {
+          override def createBarista() = barista.ref
+        })
+      coffeeHouse ! CoffeeHouse.CreateGuest(Coffee.Akkaccino)
+      val guest = barista.expectMsgPF() {
+        case Barista.PrepareCoffee(Coffee.Akkaccino, guest) => guest
+      }
+      barista.watch(guest)
+      system.stop(guest)
+      barista.expectTerminated(guest)
+      barista.within(2 seconds) {
+        barista.awaitAssert {
+          coffeeHouse ! CoffeeHouse.ApproveCoffee(Coffee.Akkaccino, guest)
+          barista.expectMsgPF(100 milliseconds) {
+            case Barista.PrepareCoffee(Coffee.Akkaccino, `guest`) => ()
+          }
+        }
+      }
+    }
+    "result in logging a thanks message at info" in {
+      val coffeeHouse = system.actorOf(CoffeeHouse.props(1), "thanks-coffee-house")
+      EventFilter.info(source = coffeeHouse.path.toString, pattern = ".*for being our guest.*", occurrences = 1) intercept {
+        coffeeHouse ! CoffeeHouse.CreateGuest(Coffee.Akkaccino)
+        val guest = TestProbe().expectActor("/user/thanks-coffee-house/$*")
+        coffeeHouse ! CoffeeHouse.ApproveCoffee(Coffee.Akkaccino, guest)
+      }
     }
   }
 }
