@@ -1,21 +1,31 @@
 package com.lightbend.training.coffeehouse
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props, Timers}
-import com.lightbend.training.coffeehouse.Guest.CoffeeFinished
+import com.lightbend.training.coffeehouse.Guest.{CaffeineException, CoffeeFinished}
 
 import scala.concurrent.duration.FiniteDuration
 
 object Guest {
   case class CoffeeFinished()
+  case object CaffeineException extends IllegalStateException
 
   def props(
       waiter: ActorRef,
       favoriteCoffee: Coffee,
-      finishCoffeeDuration: FiniteDuration): Props =
-    Props(new Guest(waiter, favoriteCoffee, finishCoffeeDuration))
+      finishCoffeeDuration: FiniteDuration,
+      caffeineLimit: Int): Props =
+    Props(new Guest(
+      waiter,
+      favoriteCoffee,
+      finishCoffeeDuration,
+      caffeineLimit))
 }
 
-class Guest(waiter: ActorRef, favoriteCoffee: Coffee, finishCoffeeDuration: FiniteDuration)
+class Guest(
+    waiter: ActorRef,
+    favoriteCoffee: Coffee,
+    finishCoffeeDuration: FiniteDuration,
+    caffeineLimit: Int)
   extends Actor
     with ActorLogging
     with Timers {
@@ -28,9 +38,13 @@ class Guest(waiter: ActorRef, favoriteCoffee: Coffee, finishCoffeeDuration: Fini
       coffeeCount += 1
       log.info(s"Enjoying my #$coffeeCount $coffee!")
       timers.startSingleTimer("coffee-finished", CoffeeFinished, finishCoffeeDuration)
-    case Guest.CoffeeFinished =>
+    case Guest.CoffeeFinished if coffeeCount <= caffeineLimit =>
       log.info(s"Finished my #$coffeeCount $favoriteCoffee")
       orderCoffee()
+    case Guest.CoffeeFinished =>
+      val diagnostic = s"I have too much caffeine ($coffeeCount > $caffeineLimit)"
+      log.warning(diagnostic)
+      throw CaffeineException
   }
 
   override def postStop(): Unit = {
