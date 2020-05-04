@@ -25,10 +25,9 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
 
     override val supervisorStrategy = {
         val decider: SupervisorStrategy.Decider = {
-            case CaffeineException => {
+            case CaffeineException =>
                 log.info("Got a guest with too many caffeine, stopping them")
                 Stop
-            }
             case t => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => Escalate)
         }
         OneForOneStrategy()(decider.orElse(super.supervisorStrategy.decider))

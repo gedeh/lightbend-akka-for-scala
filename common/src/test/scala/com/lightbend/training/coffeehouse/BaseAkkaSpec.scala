@@ -20,8 +20,11 @@ abstract class BaseAkkaSpec extends BaseSpec with BeforeAndAfterAll {
         var actor = null: ActorRef
         probe.awaitAssert {
           (probe.system actorSelection path).tell(Identify(path), probe.ref)
-          probe.expectMsgPF(100 milliseconds) {
-            case ActorIdentity(`path`, Some(ref)) => actor = ref
+          val timeout = 3.millisecond
+          probe.expectMsgPF(timeout) {
+            case ActorIdentity(_, Some(ref)) => actor = ref
+            case ActorIdentity(path, None) =>
+              System.err.println(s"Unable to find actor in path $path after $timeout")
           }
         }
         actor
