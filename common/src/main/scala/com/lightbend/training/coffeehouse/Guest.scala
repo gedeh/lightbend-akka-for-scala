@@ -42,7 +42,7 @@ class Guest(
       log.info(s"Finished my #$coffeeCount $favoriteCoffee")
       orderCoffee()
     case Guest.CoffeeFinished =>
-      val diagnostic = s"I have too much caffeine ($coffeeCount > $caffeineLimit)"
+      val diagnostic = s"I have too much caffeine (I drank $coffeeCount, limited to $caffeineLimit)"
       log.warning(diagnostic)
       throw CaffeineException
   }

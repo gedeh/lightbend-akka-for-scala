@@ -120,4 +120,21 @@ class CoffeeHouseSpec extends BaseAkkaSpec {
       }
     }
   }
+
+  "On failure of Guest CoffeeHouse" should {
+    "stop it" in {
+      val barista = TestProbe()
+      val coffeeHouse =
+        TestActorRef(new CoffeeHouse(Int.MaxValue) {
+          override def createBarista() = barista.ref
+        })
+      coffeeHouse ! CoffeeHouse.CreateGuest(Coffee.Akkaccino, 0)
+      val guest = barista.expectMsgPF() {
+        case Barista.PrepareCoffee(Coffee.Akkaccino, guest) => guest
+      }
+      barista.watch(guest)
+      guest ! Waiter.CoffeeServed(Coffee.Akkaccino)
+      barista.expectTerminated(guest)
+    }
+  }
 }
