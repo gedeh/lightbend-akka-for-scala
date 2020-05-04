@@ -2,8 +2,9 @@ package com.lightbend.training.coffeehouse
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.SupervisorStrategy.{Escalate, Stop}
+import akka.actor.SupervisorStrategy.{Escalate, Restart, Stop}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, SupervisorStrategy, Terminated}
+import com.lightbend.training.coffeehouse.Waiter.FrustratedException
 
 import scala.concurrent.duration._
 
@@ -28,34 +29,43 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
             case CaffeineException =>
                 log.info("Got a guest with too many caffeine, stopping them")
                 Stop
+            case FrustratedException =>
+                log.info("Got a waiter frustrated with too many complaints, restarting them")
+                Restart
             case t => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => Escalate)
         }
         OneForOneStrategy()(decider.orElse(super.supervisorStrategy.decider))
     }
 
-    private val finishCoffeeDuration: FiniteDuration =
+    private val waiterMaxComplaintCount: Int =
+        context.system.settings.config.getInt("coffee-house.waiter.max-complaint-count")
+
+    private val guestFinishCoffeeDuration: FiniteDuration =
         context.system.settings.config.getDuration(
             "coffee-house.guest.finish-coffee-duration",
             TimeUnit.SECONDS).seconds
 
-    private val prepareCoffeeDuration: FiniteDuration =
+    private val baristaAccuracy: Int =
+        context.system.settings.config.getInt("coffee-house.barista.accuracy")
+
+    private val baristaPrepareCoffeeDuration: FiniteDuration =
         context.system.settings.config.getDuration(
             "coffee-house.barista.prepare-coffee-duration",
             TimeUnit.SECONDS).seconds
 
-    private val waiter: ActorRef = createWaiter(self)
     private val barista: ActorRef = createBarista()
+    private val waiter: ActorRef = createWaiter(self, barista)
 
-    protected def createWaiter(coffeHouse: ActorRef): ActorRef = {
-        context.actorOf(Waiter.props(coffeHouse), "waiter")
+    protected def createWaiter(coffeeHouse: ActorRef, barista: ActorRef): ActorRef = {
+        context.actorOf(Waiter.props(coffeeHouse, barista, waiterMaxComplaintCount), "waiter")
     }
 
     protected def createBarista(): ActorRef = {
-        context.actorOf(Barista.props(prepareCoffeeDuration), "barista")
+        context.actorOf(Barista.props(baristaPrepareCoffeeDuration, baristaAccuracy), "barista")
     }
 
     protected def createGuest(favoriteCoffee: Coffee, caffeineLimit: Int): ActorRef = {
-        val guest = context.actorOf(Guest.props(waiter, favoriteCoffee, finishCoffeeDuration, caffeineLimit))
+        val guest = context.actorOf(Guest.props(waiter, favoriteCoffee, guestFinishCoffeeDuration, caffeineLimit))
         log.debug(s"Created guest ${actorName(guest)}, favorite coffee $favoriteCoffee, caffeine limit: $caffeineLimit")
         context.watch(guest)
     }
