@@ -46,10 +46,10 @@ trait Terminal {
       "status|s".r ^^ (_ => Command.Status)
 
     def quit: Parser[Command.Quit.type] =
-      "quit|q".r ^^ (_ => Command.Quit)
+      "quit|exit|q".r ^^ (_ => Command.Quit)
 
     def coffee: Parser[Coffee] =
-      "A|a|M|m|C|c".r ^^ Coffee.apply
+      "[AaMmCc]".r ^^ Coffee.apply
 
     def int: Parser[Int] =
       """\d+""".r ^^ (_.toInt)

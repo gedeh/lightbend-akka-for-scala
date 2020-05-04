@@ -1,8 +1,9 @@
 package com.lightbend.training.coffeehouse
 
 import java.util.concurrent.TimeUnit
-import java.util.UUID.randomUUID
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+
+import akka.actor.{Actor, ActorLogging, ActorRef, Props, Terminated}
+
 import scala.concurrent.duration._
 
 object CoffeeHouse {
@@ -18,7 +19,7 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
     import CoffeeHouse._
 
     //noinspection ActorMutableStateInspection
-    private var guestCaffeineIntake: Map[ActorRef, Int] = Map.empty.withDefaultValue(0)
+    private var guestBook: Map[ActorRef, Int] = Map.empty.withDefaultValue(0)
 
     private val finishCoffeeDuration: FiniteDuration =
         context.system.settings.config.getDuration(
@@ -42,7 +43,12 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
     }
 
     protected def createGuest(favoriteCoffee: Coffee): ActorRef = {
-        context.actorOf(Guest.props(waiter, favoriteCoffee, finishCoffeeDuration), s"guest-$randomUUID")
+        val guest = context.actorOf(Guest.props(waiter, favoriteCoffee, finishCoffeeDuration))
+        context.watch(guest)
+    }
+
+    private def guestName(guest: ActorRef): String = {
+        guest.path.name
     }
 
     override def preStart(): Unit = {
@@ -51,16 +57,19 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
 
     override def receive: Receive = {
         case CreateGuest(favoriteCoffee) =>
-            log.info("Create Guest")
             val guest = createGuest(favoriteCoffee)
-            log.info(s"Guest ${guest.path.name} added to guest book")
-            guestCaffeineIntake += guest -> 0
-        case ApproveCoffee(coffee, guest) if guestCaffeineIntake(guest) < caffeineLimit =>
-            guestCaffeineIntake += guest -> (guestCaffeineIntake(guest) + 1)
-            log.info(s"Guest ${guest.path.name} caffeine count incremented")
+            guestBook += guest -> 0
+            log.info(s"Guest ${guestName(guest)} added to guest book. Active guests ${guestBook.size}")
+        case ApproveCoffee(coffee, guest) if guestBook(guest) < caffeineLimit =>
+            val newCount = guestBook(guest) + 1
+            guestBook += guest -> newCount
+            log.info(s"Guest ${guestName(guest)} caffeine count incremented to $newCount")
             barista.forward(PrepareCoffee(coffee, guest))
         case ApproveCoffee(_, guest) =>
-            log.info(s"Sorry, ${guest.path.name}, but you have reached your limit")
+            log.info(s"Sorry, ${guestName(guest)}, but you have reached your limit")
             context.stop(guest)
+        case Terminated(guest) =>
+            guestBook -= guest
+            log.info(s"Thank you ${guestName(guest)}, for being our guest! Active guests ${guestBook.size}")
     }
 }
