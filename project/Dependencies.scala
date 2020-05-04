@@ -5,7 +5,7 @@ object Version {
   val akkaVer           = "2.6.3"
   val logbackVer        = "1.2.3"
   val logbackContribVer = "0.1.5"
-  val scalaVer          = "2.13.1"
+  val scalaVer          = "2.13.2"
   val scalaParsersVer   = "1.1.2"
   val scalaTestVer      = "3.1.0"
 
