@@ -36,7 +36,7 @@ class Guest(
   override def receive: Receive = {
     case Waiter.CoffeeServed(coffee) =>
       coffeeCount += 1
-      log.info(s"Enjoying my #$coffeeCount $coffee!")
+      log.info(s"Enjoying my #$coffeeCount $coffee")
       timers.startSingleTimer("coffee-finished", CoffeeFinished, finishCoffeeDuration)
     case Guest.CoffeeFinished if coffeeCount <= caffeineLimit =>
       log.info(s"Finished my #$coffeeCount $favoriteCoffee")
@@ -53,7 +53,7 @@ class Guest(
   }
 
   private def orderCoffee(): Unit = {
-    log.info(s"Order #${coffeeCount + 1} $favoriteCoffee to waiter")
+    log.info(s"Ordering my #${coffeeCount + 1} $favoriteCoffee to waiter")
     waiter ! Waiter.ServeCoffee(favoriteCoffee)
   }
 

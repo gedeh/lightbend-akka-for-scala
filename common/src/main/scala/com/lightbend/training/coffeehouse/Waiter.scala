@@ -16,10 +16,10 @@ class Waiter(barista: ActorRef) extends Actor with ActorLogging {
 
   override def receive: Receive = {
     case ServeCoffee(coffee) =>
-      log.info(s"Sending order coffee $coffee from ${sender().path.name} to barista")
+      log.info(s"Sending order coffee $coffee from guest ${sender().path.name} to coffee-house")
       barista ! CoffeeHouse.ApproveCoffee(coffee, sender())
     case CoffeePrepared(coffee, guest) =>
-      log.info(s"Serving coffee $coffee to ${guest.path.name}")
+      log.info(s"Serving coffee $coffee to guest ${guest.path.name}")
       guest ! CoffeeServed(coffee)
   }
 }

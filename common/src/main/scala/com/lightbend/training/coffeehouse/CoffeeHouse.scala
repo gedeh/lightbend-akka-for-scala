@@ -25,7 +25,10 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
 
     override val supervisorStrategy = {
         val decider: SupervisorStrategy.Decider = {
-            case CaffeineException => Stop
+            case CaffeineException => {
+                log.info("Got a guest with too many caffeine, stopping them")
+                Stop
+            }
             case t => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => Escalate)
         }
         OneForOneStrategy()(decider.orElse(super.supervisorStrategy.decider))
@@ -54,10 +57,11 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
 
     protected def createGuest(favoriteCoffee: Coffee, caffeineLimit: Int): ActorRef = {
         val guest = context.actorOf(Guest.props(waiter, favoriteCoffee, finishCoffeeDuration, caffeineLimit))
+        log.debug(s"Created guest ${actorName(guest)}, favorite coffee $favoriteCoffee, caffeine limit: $caffeineLimit")
         context.watch(guest)
     }
 
-    private def guestName(guest: ActorRef): String = {
+    private def actorName(guest: ActorRef): String = {
         guest.path.name
     }
 
@@ -69,17 +73,17 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
         case CreateGuest(favoriteCoffee, caffeineLimit) =>
             val guest = createGuest(favoriteCoffee, caffeineLimit)
             guestBook += guest -> 0
-            log.info(s"Guest ${guestName(guest)} added to guest book. Active guests ${guestBook.size}")
+            log.info(s"Guest ${actorName(guest)} added to guest book. Active guests ${guestBook.size}")
         case ApproveCoffee(coffee, guest) if guestBook(guest) < caffeineLimit =>
             val newCount = guestBook(guest) + 1
             guestBook += guest -> newCount
-            log.info(s"Guest ${guestName(guest)} caffeine count incremented to $newCount")
+            log.info(s"Received coffee order from guest ${actorName(guest)}. Guest caffeine count incremented to $newCount")
             barista.forward(PrepareCoffee(coffee, guest))
         case ApproveCoffee(_, guest) =>
-            log.info(s"Sorry, ${guestName(guest)}, but you have reached your limit")
+            log.info(s"Received coffee order from guest ${actorName(guest)}. Sorry, but you have reached your limit")
             context.stop(guest)
         case Terminated(guest) =>
             guestBook -= guest
-            log.info(s"Thank you ${guestName(guest)}, for being our guest! Active guests ${guestBook.size}")
+            log.info(s"Thank you ${actorName(guest)}, for being our guest! Active guests ${guestBook.size}")
     }
 }
