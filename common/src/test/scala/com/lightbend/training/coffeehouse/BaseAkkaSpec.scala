@@ -14,20 +14,15 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 abstract class BaseAkkaSpec extends BaseSpec with BeforeAndAfterAll {
 
   implicit class TestProbeOps(probe: TestProbe) {
-
     def expectActor(path: String, max: FiniteDuration = 3.seconds): ActorRef = {
       probe.within(max) {
-        var actor = null: ActorRef
         probe.awaitAssert {
-          (probe.system actorSelection path).tell(Identify(path), probe.ref)
-          val timeout = 3.millisecond
-          probe.expectMsgPF(timeout) {
-            case ActorIdentity(_, Some(ref)) => actor = ref
-            case ActorIdentity(path, None) =>
-              System.err.println(s"Unable to find actor in path $path after $timeout")
+          probe.system.actorSelection(path).tell(Identify(path), probe.ref)
+          probe.expectMsgPF(max) {
+            case ActorIdentity(`path`, Some(ref)) => ref
+            case ActorIdentity(`path`, None) => throw new RuntimeException(s"Unable to find actor with path $path in system $system after $max")
           }
         }
-        actor
       }
     }
   }

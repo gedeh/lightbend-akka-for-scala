@@ -3,6 +3,7 @@ package com.lightbend.training.coffeehouse
 import java.util.concurrent.TimeUnit
 
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, SupervisorStrategy, Terminated}
+import akka.routing.FromConfig
 import com.lightbend.training.coffeehouse.Waiter.FrustratedException
 
 import scala.concurrent.duration._
@@ -61,7 +62,9 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
     }
 
     protected def createBarista(): ActorRef = {
-        context.actorOf(Barista.props(baristaPrepareCoffeeDuration, baristaAccuracy), "barista")
+        context.actorOf(FromConfig.props(
+            Barista.props(baristaPrepareCoffeeDuration, baristaAccuracy)),
+            "barista")
     }
 
     protected def createGuest(favoriteCoffee: Coffee, caffeineLimit: Int): ActorRef = {
