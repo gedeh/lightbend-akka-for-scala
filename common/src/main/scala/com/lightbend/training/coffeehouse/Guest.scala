@@ -1,6 +1,7 @@
 package com.lightbend.training.coffeehouse
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props, Timers}
+import akka.event.LoggingReceive
 import com.lightbend.training.coffeehouse.Guest.{CaffeineException, CoffeeFinished}
 
 import scala.concurrent.duration.FiniteDuration
@@ -33,7 +34,7 @@ class Guest(
   var coffeeCount: Int = 0
   orderCoffee()
 
-  override def receive: Receive = {
+  override def receive: Receive = LoggingReceive {
     case Waiter.CoffeeServed(`favoriteCoffee`) =>
       coffeeCount += 1
       log.info(s"Enjoying my #$coffeeCount $favoriteCoffee")
