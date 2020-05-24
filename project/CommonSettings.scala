@@ -19,6 +19,7 @@ object CommonSettings {
     EclipseKeys.skipProject := true,
     parallelExecution in GlobalScope := false,
     cinnamon in run := true,
+    cinnamon in test := true,
     cinnamonLogLevel := "INFO",
     // Required for Cinnamon due to our usage of StdIn.readLine().
     // See: https://www.scala-sbt.org/1.x/docs/Forking.html#Configuring+Input

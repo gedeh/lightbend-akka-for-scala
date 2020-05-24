@@ -2,7 +2,7 @@ import com.lightbend.cinnamon.sbt.Cinnamon
 import sbt._
 
 object Version {
-  val akkaVer           = "2.6.3"
+  val akkaVer           = "2.6.5"
   val logbackVer        = "1.2.3"
   val logbackContribVer = "0.1.5"
   val scalaVer          = "2.13.2"
@@ -19,7 +19,7 @@ object Dependencies {
     "ch.qos.logback.contrib"     % "logback-jackson"            % Version.logbackContribVer,
     "ch.qos.logback.contrib"     % "logback-json-classic"       % Version.logbackContribVer,
     "org.scala-lang.modules"    %% "scala-parser-combinators"   % Version.scalaParsersVer,
-    "com.lightbend.akka"        %% "akka-diagnostics"           % "1.1.12",
+    "com.lightbend.akka"        %% "akka-diagnostics"           % "1.1.14",
     Cinnamon.library.cinnamonAkka,
     Cinnamon.library.cinnamonJvmMetricsProducer,
     Cinnamon.library.cinnamonPrometheus,
