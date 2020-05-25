@@ -1,7 +1,6 @@
 package com.lightbend.training.coffeehouse
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import akka.event.LoggingReceive
 
 object Waiter {
   case class ServeCoffee(coffee: Coffee)
@@ -15,13 +14,13 @@ object Waiter {
 
 class Waiter(coffeeHouse: ActorRef, barista: ActorRef, maxComplaintCount: Int) extends Actor with ActorLogging {
 
-  import Barista._
   import Waiter._
+  import Barista._
 
   //noinspection ActorMutableStateInspection
   private var complaintsReceived: Int = 0
 
-  override def receive: Receive = LoggingReceive {
+  override def receive: Receive = {
     case ServeCoffee(coffee) =>
       log.info(s"Sending order coffee $coffee from guest ${sender().path.name} to coffee-house")
       coffeeHouse ! CoffeeHouse.ApproveCoffee(coffee, sender())

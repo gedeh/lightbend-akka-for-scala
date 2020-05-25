@@ -3,7 +3,6 @@ package com.lightbend.training.coffeehouse
 import java.util.concurrent.TimeUnit
 
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, SupervisorStrategy, Terminated}
-import akka.event.LoggingReceive
 import akka.routing.FromConfig
 import com.lightbend.training.coffeehouse.Waiter.FrustratedException
 
@@ -59,11 +58,13 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
     private val waiter: ActorRef = createWaiter()
 
     protected def createWaiter(): ActorRef = {
-        context.actorOf(FromConfig.props(Waiter.props(self, barista, waiterMaxComplaintCount)), "waiter")
+        context.actorOf(Waiter.props(self, barista, waiterMaxComplaintCount), "waiter")
     }
 
     protected def createBarista(): ActorRef = {
-        context.actorOf(FromConfig.props(Barista.props(baristaPrepareCoffeeDuration, baristaAccuracy)), "barista")
+        context.actorOf(FromConfig.props(
+            Barista.props(baristaPrepareCoffeeDuration, baristaAccuracy)),
+            "barista")
     }
 
     protected def createGuest(favoriteCoffee: Coffee, caffeineLimit: Int): ActorRef = {
@@ -80,7 +81,7 @@ class CoffeeHouse(caffeineLimit: Int) extends Actor with ActorLogging {
         log.debug("CoffeHouse Open")
     }
 
-    override def receive: Receive = LoggingReceive {
+    override def receive: Receive = {
         case CreateGuest(favoriteCoffee, caffeineLimit) =>
             val guest = createGuest(favoriteCoffee, caffeineLimit)
             guestBook += guest -> 0
