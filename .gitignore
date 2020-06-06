@@ -1,9 +1,10 @@
 .metals
-.bloops
+.bloop
 .idea
 
-target
 akka-diagnostics
 logs
+project/metals.sbt
+target
 
 lightbend.sbt
