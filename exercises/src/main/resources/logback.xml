@@ -9,8 +9,8 @@
         </encoder>
     </appender>
 
-    <appender name="file" class="ch.qos.logback.core.FileAppender">
-        <file>logs/${coffee-house.log-file:-coffee-house.log}</file>
+    <appender name="json-file" class="ch.qos.logback.core.FileAppender">
+        <file>logs/${coffee-house.log-file:-coffee-house-json.log}</file>
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
                 <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSX</timestampFormat>
@@ -23,17 +23,23 @@
         </encoder>
     </appender>
 
-    <logger name="com.lightbend.training.coffeehouse" level="debug" additivity="false">
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <file>logs/${coffee-house.log-file:-coffee-house.log}</file>
+        <encoder>
+            <pattern>%date{HH:mm:ss} %-5level [%X{akkaSource}] [%logger] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.lightbend.training.coffeehouse" level="info" additivity="false">
         <appender-ref ref="console"/>
+    </logger>
+
+    <logger name="com.lightbend.training.coffeehouse" level="debug" additivity="true">
+        <appender-ref ref="json-file"/>
         <appender-ref ref="file"/>
     </logger>
 
-    <logger name="akka.actor.RepointableActorRef" level="debug" additivity="false">
-        <appender-ref ref="console"/>
-        <appender-ref ref="file"/>
-    </logger>
-
-    <root level="info">
+    <root level="warn">
         <appender-ref ref="console"/>
         <appender-ref ref="file"/>
     </root>
