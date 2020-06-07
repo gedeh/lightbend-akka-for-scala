@@ -34,7 +34,7 @@
         <appender-ref ref="console"/>
     </logger>
 
-    <logger name="com.lightbend.training.coffeehouse" level="debug" additivity="true">
+    <logger name="com.lightbend.training.coffeehouse" level="debug" additivity="false">
         <appender-ref ref="json-file"/>
         <appender-ref ref="file"/>
     </logger>

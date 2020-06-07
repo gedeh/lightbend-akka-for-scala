@@ -6,11 +6,21 @@ package com.lightbend.training.coffeehouse
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.event.Logging
+import akka.pattern.ask
+import akka.util.Timeout
 
 import scala.annotation.tailrec
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 import scala.io.StdIn
+
+import com.lightbend.training.coffeehouse.CoffeeHouse.GetStatus
+
+
+import java.util.concurrent.TimeUnit
+import scala.util.Success
+import scala.util.Failure
+import com.lightbend.training.coffeehouse.CoffeeHouse.Status
 
 object CoffeeHouseApp {
 
@@ -22,7 +32,8 @@ object CoffeeHouseApp {
     val name = opts.getOrElse("name", "coffee-house")
 
     val system = ActorSystem(s"$name-system")
-    val coffeeHouseApp = new CoffeeHouseApp(system)
+    val timeout = system.settings.config.getDuration("coffee-house.status-timeout", TimeUnit.MILLISECONDS).millis
+    val coffeeHouseApp = new CoffeeHouseApp(system)(timeout)
     coffeeHouseApp.run()
   }
 
@@ -34,8 +45,8 @@ object CoffeeHouseApp {
       System.setProperty(key substring 2, value)
 }
 
-class CoffeeHouseApp(system: ActorSystem) extends Terminal {
-
+class CoffeeHouseApp(system: ActorSystem)(implicit statusTimeout: Timeout) extends Terminal {
+  import system.dispatcher
   private val log = Logging(system, getClass.getName)
   private val caffeineLimit: Int = system.settings.config.getInt("coffee-house.caffeine-limit")
   private val coffeeHouse = createCoffeeHouse()
@@ -71,5 +82,11 @@ class CoffeeHouseApp(system: ActorSystem) extends Terminal {
     }
   }
 
-  protected def status(): Unit = ()
+  protected def status(): Unit = {
+    val result = coffeeHouse ? CoffeeHouse.GetStatus
+    result.mapTo[CoffeeHouse.Status].onComplete {
+      case Success(Status(guestCount)) => log.info(s"Status: guest count $guestCount")
+      case Failure(exception) => log.error("Cant get status", exception)
+    }
+  }
 }
