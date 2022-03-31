@@ -1,4 +1,4 @@
-import com.lightbend.cinnamon.sbt.Cinnamon.CinnamonKeys.{cinnamon, cinnamonLogLevel}
+// import com.lightbend.cinnamon.sbt.Cinnamon.CinnamonKeys.{cinnamon, cinnamonLogLevel}
 import com.typesafe.sbteclipse.core.EclipsePlugin.{EclipseCreateSrc, EclipseKeys}
 import sbt.Keys._
 import sbt._
@@ -18,9 +18,9 @@ object CommonSettings {
     EclipseKeys.skipParents in ThisBuild := true,
     EclipseKeys.skipProject := true,
     parallelExecution in GlobalScope := false,
-    cinnamon in run := true,
-    cinnamon in test := true,
-    cinnamonLogLevel := "INFO",
+    // cinnamon in run := true,
+    // cinnamon in test := true,
+    // cinnamonLogLevel := "INFO",
     // Required for Cinnamon due to our usage of StdIn.readLine().
     // See: https://www.scala-sbt.org/1.x/docs/Forking.html#Configuring+Input
     connectInput in run := true,

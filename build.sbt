@@ -12,4 +12,4 @@ lazy val common = project.settings(CommonSettings.commonSettings: _*)
 lazy val exercises = project
   .settings(CommonSettings.commonSettings: _*)
   .dependsOn(common % "test->test;compile->compile")
-  .enablePlugins(Cinnamon)
+  // .enablePlugins(Cinnamon)

@@ -1,4 +1,4 @@
-import com.lightbend.cinnamon.sbt.Cinnamon
+// import com.lightbend.cinnamon.sbt.Cinnamon
 import sbt._
 
 object Version {
@@ -19,11 +19,11 @@ object Dependencies {
     "ch.qos.logback.contrib"     % "logback-jackson"            % Version.logbackContribVer,
     "ch.qos.logback.contrib"     % "logback-json-classic"       % Version.logbackContribVer,
     "org.scala-lang.modules"    %% "scala-parser-combinators"   % Version.scalaParsersVer,
-    "com.lightbend.akka"        %% "akka-diagnostics"           % "1.1.14",
-    Cinnamon.library.cinnamonAkka,
-    Cinnamon.library.cinnamonJvmMetricsProducer,
-    Cinnamon.library.cinnamonPrometheus,
-    Cinnamon.library.cinnamonPrometheusHttpServer,
+    // "com.lightbend.akka"        %% "akka-diagnostics"           % "1.1.14",
+    // Cinnamon.library.cinnamonAkka,
+    // Cinnamon.library.cinnamonJvmMetricsProducer,
+    // Cinnamon.library.cinnamonPrometheus,
+    // Cinnamon.library.cinnamonPrometheusHttpServer,
     "com.typesafe.akka"         %% "akka-testkit"               % Version.akkaVer % "test",
     "org.scalatest"             %% "scalatest"                  % Version.scalaTestVer % "test",
     "com.fasterxml.jackson.core" % "jackson-databind"           % "2.10.3"
